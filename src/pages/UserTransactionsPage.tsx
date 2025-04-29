@@ -26,6 +26,7 @@ interface Order {
 }
 
 const UserTransactionsPage = () => {
+  const [orderCounts, setOrderCounts] = useState<{ [key: string]: number }>({});
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userOrders, setUserOrders] = useState<Order[]>([]);
@@ -49,6 +50,10 @@ const UserTransactionsPage = () => {
     try {
       const response = await axios.get(`http://localhost:8084/api/orders/user/${userId}`);
       setUserOrders(response.data);
+      setOrderCounts(prev => ({
+        ...prev,
+        [userId]: response.data.length
+      }));
     } catch (error) {
       handleError(error, 'Failed to fetch orders');
     }
@@ -160,7 +165,7 @@ const UserTransactionsPage = () => {
                 <td className="px-6 py-4">{user.name}</td>
                 <td className="px-6 py-4">{user.email}</td>
                 <td className="px-6 py-4">{user.phone}</td>
-                <td className="px-6 py-4">{userOrders.filter(o => o.id === user.id).length}</td>
+                <td className="px-6 py-4">{orderCounts[user.id] || 0}</td>
                 <td className="px-6 py-4">
                   <button className="text-indigo-600 hover:text-indigo-900">
                     View Details

@@ -26,6 +26,7 @@ interface Order {
 }
 
 const RestaurantTransactionsPage = () => {
+  const [orderCounts, setOrderCounts] = useState<{ [key: string]: number }>({});
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [restaurantOrders, setRestaurantOrders] = useState<Order[]>([]);
@@ -50,6 +51,10 @@ const RestaurantTransactionsPage = () => {
     try {
       const response = await axios.get(`http://localhost:8084/api/orders/restaurant/${restaurantId}`);
       setRestaurantOrders(response.data);
+      setOrderCounts(prev => ({
+        ...prev,
+        [restaurantId]: response.data.length
+      }));
     } catch (error) {
       handleError(error, 'Failed to fetch orders');
     }
@@ -161,7 +166,7 @@ const RestaurantTransactionsPage = () => {
                 <td className="px-6 py-4">{restaurant.name}</td>
                 <td className="px-6 py-4">{restaurant.owner}</td>
                 <td className="px-6 py-4">{restaurant.address}</td>
-                <td className="px-6 py-4">{restaurantOrders.filter(o => o.id === restaurant.owner).length}</td>
+                <td className="px-6 py-4">{orderCounts[restaurant.id] || 0}</td>
                 <td className="px-6 py-4">
                   <button className="text-indigo-600 hover:text-indigo-900">
                     View Details
